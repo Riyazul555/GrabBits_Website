@@ -1,8 +1,10 @@
 name: Greetings
 
 on:
-  pull_request_target:
   issues:
+    types: [opened]
+  pull_request_target:
+    types: [opened]
 
 jobs:
   greeting:
@@ -12,15 +14,7 @@ jobs:
         uses: actions/first-interaction@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          issue-message: |
-            Greetings! 👋 
-            Thank you for creating your first issue for GrabBits. 
-            We appreciate your contribution and will attend to it promptly. 
-            Should you have any questions or need further assistance, feel free to reach out. 
-            We look forward to collaborating with you!
-          pr-message: |
-            Congratulations! 🎉 
-            We would like to acknowledge and celebrate your first pull request for GrabBits. 
-            Our dedicated team will review it diligently. 
-            Should you have any queries or require guidance, do not hesitate to ask. 
-            Thank you for your valuable contribution.
+          issue-message: 
+            'Great job, @${{ github.actor }}! 🎉.Thank you for creating your first issue for GrabBits.We appreciate your contribution and will attend to it promptly.Should you have any questions or need further assistance, feel free to reach out on our project GrabBits discord server at GSSoC23.We look forward to collaborating with you!'
+          pr-message: 
+            'Congratulations! @${{ github.actor }}! 🎉.We would like to acknowledge and celebrate your first pull request for GrabBits.Our dedicated team will review it diligently.Should you have any queries or require guidance, feel free to reach out on our project GrabBits discord server at GSSoC23.Thank you for Contributing to GrabBit!! Please ⭐ the repository and follow me on [Github](https://github.com/Bhushan8177).'

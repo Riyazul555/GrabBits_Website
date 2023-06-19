@@ -9,21 +9,29 @@ import ThemeButton from '../common/ThemeButton/ThemeButton';
 import debounce from '../../helper/debounce';
 
 const Opportunities = () => {
+	const [pageNumber, setPageNumber] = useState(0);
 	const [jobData, setJobData] = useState(null);
 	const [test, setTest] = useState(null);
 	const [loading, setLoading] = useState(true);
-
+    const [numberOfPages, setNumberOfPages] = useState(0);
+  const [pages, setPages] = useState([]);
+  const [limit, setLimit] = useState(5);
 	useEffect(() => {
 		ReactGA.send('pageview');
 		getData();
-	}, []);
-
+	}, [pageNumber, limit]);
+	useEffect(() => {
+		const pageButtons = new Array(numberOfPages).fill(null).map((_, i) => i);
+		setPages(pageButtons);
+	  }, [numberOfPages]);	
 	const getData = async () => {
 		try {
-			http.get('/job/getJobs').then((response) => {
+			http.get(`/job/getJobs?page=${pageNumber}&limit=${limit}`).then((response) => {
 				const data = response.data.jobs;
+				const totalPages=response.data.totalPages;
 				setLoading(false);
 				setJobData(data);
+				setNumberOfPages(totalPages);
 				setTest(data);
 			});
 		} catch (error) {
@@ -34,6 +42,23 @@ const Opportunities = () => {
 			});
 		}
 	};
+    
+	const handlePageChange = (event) => {
+		setPageNumber(parseInt(event.target.value));
+	  };
+	
+	  const LimitPageChange = (event) => {
+		setLimit(parseInt(event.target.value));
+		setPageNumber(0); // Reset page number when limit changes
+	  };
+	
+	  const gotoPrevious = () => {
+		setPageNumber((prevPageNumber) => Math.max(0, prevPageNumber - 1));
+	  };
+	
+	  const gotoNext = () => {
+		setPageNumber((prevPageNumber) => Math.min(numberOfPages - 1, prevPageNumber + 1));
+	  };	
 
 	const debouncedSearch = debounce(async (key) => {
 			try {
@@ -133,6 +158,92 @@ const Opportunities = () => {
 					</>
 				)} */}
 			</div>
+
+					<div
+		style={{
+			display: 'flex',
+			justifyContent: 'center',
+			alignItems: 'center',
+			marginTop: '20px',
+			marginBottom: '20px',
+		}}
+		>
+		<button
+			onClick={gotoPrevious}
+			disabled={pageNumber === 0}
+			style={{
+			color: '#ECF0F1',
+			padding: '10px 20px',
+			fontSize: '16px',
+			fontWeight: 'bold',
+			backgroundColor: '#7F00FF',
+			border: '2px solid black',
+			borderRadius: '5px',
+			marginRight: '10px',
+			}}
+		>
+			Prev
+		</button>
+
+		<select
+			value={pageNumber}
+			onChange={handlePageChange}
+			style={{
+			padding: '10px 20px',
+			fontSize: '16px',
+			fontWeight: 'bold',
+			backgroundColor: '#f0f0f0',
+			border: '2px solid black',
+			borderRadius: '5px',
+			marginRight: '10px',
+			}}
+		>
+			{pages.map((pageIndex) => (
+			<option key={pageIndex} value={pageIndex}>
+				{pageIndex + 1}
+			</option>
+			))}
+		</select>
+		<h2 style={{ marginTop: '4px', marginRight: '12px' }}>of {numberOfPages}</h2>
+		<button
+			onClick={gotoNext}
+			disabled={pageNumber === numberOfPages - 1}
+			style={{
+			color: '#ECF0F1',
+			padding: '10px 20px',
+			fontSize: '16px',
+			fontWeight: 'bold',
+			backgroundColor: '#7F00FF',
+			border: '2px solid black',
+			borderRadius: '5px',
+			marginLeft: '10px',
+			}}
+		>
+			Next
+		</button>
+
+		<div style={{ marginLeft: '50px', display: 'flex', alignItems: 'center' }}>
+			<h2 style={{ marginTop: '4px', marginRight: '12px' }}>Items per page</h2>
+			<select
+			value={limit}
+			onChange={LimitPageChange}
+			style={{
+				padding: '10px 20px',
+				fontSize: '16px',
+				fontWeight: 'bold',
+				backgroundColor: '#f0f0f0',
+				border: '2px solid black',
+				borderRadius: '5px',
+			}}
+			>
+			<option>5</option>
+			<option>10</option>
+			<option>20</option>
+			<option>50</option>
+			</select>
+		</div>
+		</div>
+
 		</>
 	);
 };
