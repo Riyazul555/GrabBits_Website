@@ -43,12 +43,7 @@ const addJob = async (req, res) => {
 };
 
 const getAllJobs = async (req, res) => {
-  const PAGE_SIZE = parseInt(req.query.limit || "10");
-  const page = parseInt(req.query.page || "0");
-  const total = await Job.find({}).count();
-  const jobs = await Job.find().sort({ createdAt: -1 })      
-  .limit(PAGE_SIZE)
-  .skip(PAGE_SIZE * page);;
+  const jobs = await Job.find().sort({ createdAt: -1 });
   const finalJobs = jobs.map((job) => {
     if (job.image) {
       let buffer = Buffer.from(job.image);
@@ -84,7 +79,7 @@ const getAllJobs = async (req, res) => {
   });
   res
     .status(201)
-    .json({ totalPages: Math.ceil(total / PAGE_SIZE),jobs: finalJobs, message: "Fetched Jobs Successfully" });
+    .json({ jobs: finalJobs, message: "Fetched Jobs Successfully" });
 };
 
 const getJobById = async (req, res) => {
